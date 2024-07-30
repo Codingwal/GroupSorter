@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include "hutParser.h"
+#include "errorHandler.h"
 
 std::vector<GroupSorter::Container> ParseHuts(std::string fileName)
 {
@@ -9,10 +10,7 @@ std::vector<GroupSorter::Container> ParseHuts(std::string fileName)
     std::ifstream file(fileName);
 
     if (!file.is_open())
-    {
-        std::cerr << "Datei '" << fileName << "' konnte nicht geöffnet werden\n";
-        exit(EXIT_FAILURE);
-    }
+        Error(Errors::cant_open_file);
 
     std::string line;
     std::string num = "";

@@ -1,10 +1,12 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <format>
 
 #include "groupSorter.h"
 #include "personParser.h"
 #include "hutParser.h"
+#include "errorHandler.h"
 
 using namespace std;
 
@@ -12,8 +14,7 @@ int main(int argc, char **argv)
 {
     if (argc != 3)
     {
-        cout << "Fehlende oder zu viele Parameter!\nKorrekte Verwendung:\n./main [Personendatei] [Huettendatei]";
-        return 0;
+        Error(Errors::invalid_params);
     }
     PersonParser personParser;
     map<GroupSorter::GroupID, GroupSorter::Group> groups = personParser.ParsePeople(argv[1]);

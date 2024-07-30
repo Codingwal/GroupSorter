@@ -1,10 +1,10 @@
 CXX = C:\\msys64\\ucrt64\\bin\\g++.exe
-CXXFLAGS = -Og -g3 -ggdb -fdiagnostics-color=always
+CXXFLAGS = -std=c++20 -Og -g3 -ggdb -fdiagnostics-color=always
 
 srcDir = src/
 buildDir = build/
 
-objects = build/main.o build/groupSorter.o build/personParser.o build/hutParser.o
+objects = build/main.o build/groupSorter.o build/personParser.o build/hutParser.o build/errorHandler.o
 
 .PHONY: all
 all: $(objects)

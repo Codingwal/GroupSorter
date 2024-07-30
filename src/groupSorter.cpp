@@ -1,7 +1,10 @@
 #include "groupSorter.h"
+
 #include <stdio.h>
 #include <cassert>
 #include <iostream>
+
+#include "errorHandler.h"
 
 void GroupSorter::FindAllSolutions()
 {
@@ -63,10 +66,8 @@ void GroupSorter::VerifyInput()
     for (auto &container : containers)
     {
         if (container.capacity == 0)
-        {
-            std::cerr << "Container mit Kapazitaet 0 gefunden\n";
-            exit(EXIT_FAILURE);
-        }
+            Error(Errors::container_without_capacity);
+
         totalContainerSlots += container.capacity;
     }
 
@@ -77,24 +78,16 @@ void GroupSorter::VerifyInput()
         {
             auto &other = groups[otherID];
             if (std::find(other.cantBeWith.begin(), other.cantBeWith.end(), i) != other.cantBeWith.end())
-            {
-                std::cerr << "Wiederspruch in Beziehung gefunden\n";
-                exit(EXIT_FAILURE);
-            }
+                Error(Errors::invalid_relation);
+
             if (std::find(other.mustBeWith.begin(), other.mustBeWith.end(), i) == other.mustBeWith.end())
-            {
-                std::cerr << "Einseitige Beziehung gefunden\n";
-                exit(EXIT_FAILURE);
-            }
+                Error(Errors::one_way_relation);
         }
         totalObjCount++;
     }
 
     if (totalObjCount > totalContainerSlots)
-    {
-        std::cerr << "Es gibt mehr Objekte als Plaetze\n";
-        exit(EXIT_FAILURE);
-    }
+        Error(Errors::more_objs_than_space);
 }
 void GroupSorter::RecursiveTree(std::vector<GroupID> ids)
 {
@@ -118,12 +111,7 @@ void GroupSorter::RecursiveTree(std::vector<GroupID> ids)
 }
 bool GroupSorter::TryAdd(GroupID id)
 {
-    if (currentContainerIndex >= containers.size())
-    {
-        std::cerr << currentContainerIndex << "; " << id << "\n";
-        PrintContainers(containers);
-        exit(EXIT_FAILURE);
-    }
+    assert(currentContainerIndex < containers.size());
 
     Container &ctr = containers[currentContainerIndex];
     Group &group = groups[id];
@@ -157,13 +145,9 @@ bool GroupSorter::TryAdd(GroupID id)
 }
 void GroupSorter::RemoveGroup(GroupID id)
 {
-    // std::cout << currentContainerIndex << "\n";
-
     if (containers[currentContainerIndex].size == 0 || currentContainerIndex == containers.size())
         currentContainerIndex--;
 
-    // if (currentContainerIndex >= containers.size())
-    //     std::cerr << "ERROR: " << currentContainerIndex << "\n";
     Container &ctr = containers[currentContainerIndex];
     ctr.groups.pop_back();
     ctr.size -= groups[id].objs.size();
