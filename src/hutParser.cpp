@@ -1,0 +1,57 @@
+#include <iostream>
+#include <fstream>
+
+#include "hutParser.h"
+
+std::vector<GroupSorter::Container> ParseHuts(std::string fileName)
+{
+    std::vector<GroupSorter::Container> huts;
+    std::ifstream file(fileName);
+
+    if (!file.is_open())
+    {
+        std::cerr << "Datei '" << fileName << "' konnte nicht geöffnet werden\n";
+        exit(EXIT_FAILURE);
+    }
+
+    std::string line;
+    std::string num = "";
+    for (int lineIndex = 1; std::getline(file, line); lineIndex++)
+    {
+        for (char c : line)
+        {
+            if (c == ',')
+            {
+                int capacity = std::stoi(num);
+                huts.push_back(GroupSorter::Container(capacity));
+                num = "";
+            }
+            else if (std::isspace(c))
+                continue;
+            else if (std::isdigit(c))
+                num.push_back(c);
+            else
+                std::cerr << "Invalides Zeichen '" << c << "' in Zeile " << lineIndex << "\n";
+        }
+        if (num != "")
+        {
+            int capacity = std::stoi(num);
+            huts.push_back(GroupSorter::Container(capacity));
+            num = "";
+        }
+    }
+
+    // PrintHuts(huts);
+
+    return huts;
+}
+
+void PrintHuts(std::vector<GroupSorter::Container> &huts)
+{
+    std::cout << "\nPrinting huts:\n";
+    for (auto &hut : huts)
+    {
+        std::cout << hut.capacity << ", ";
+    }
+    std::cout << "\n";
+}
