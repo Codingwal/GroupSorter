@@ -6,9 +6,8 @@ buildDir = build/
 
 objects = build/main.o build/groupSorter.o build/personParser.o build/hutParser.o
 
-.PHONY: all
-all: $(objects)
-	$(CXX) $^ -o main.exe
+main.exe: $(objects)
+	$(CXX) $^ -o main.exe -static
 
 # Define a pattern rule that compiles every .c file into a .o file
 $(objects): $(buildDir)%.o : $(srcDir)%.cpp
