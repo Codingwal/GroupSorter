@@ -47,6 +47,8 @@ public:
     };
 
 public:
+    GroupSorter(std::map<GroupSorter::GroupID, GroupSorter::Group> &groups, std::vector<GroupSorter::Container> &containers)
+        : groups(groups), containers(containers) {}
     void FindAllSolutions();
     static void PrintGroups(std::map<GroupID, Group> groups, bool printMustBeWith, bool printCantBeWith);
     static void PrintContainers(std::vector<Container> containers);
