@@ -5,6 +5,7 @@
 
 void GroupSorter::FindAllSolutions()
 {
+    VerifyInput();
     // Merge groups
     {
         for (int i = 0; i < groups.size(); i++)
@@ -53,6 +54,47 @@ void GroupSorter::FindAllSolutions()
     }
 
     RecursiveTree(ids);
+}
+void GroupSorter::VerifyInput()
+{
+    size_t totalObjCount = 0;
+    size_t totalContainerSlots = 0;
+
+    for (auto &container : containers)
+    {
+        if (container.capacity == 0)
+        {
+            std::cerr << "Container mit Kapazitaet 0 gefunden\n";
+            exit(EXIT_FAILURE);
+        }
+        totalContainerSlots += container.capacity;
+    }
+
+    for (int i = 0; i < groups.size(); i++)
+    {
+        auto &group = groups[i];
+        for (ObjID otherID : group.mustBeWith)
+        {
+            auto &other = groups[otherID];
+            if (std::find(other.cantBeWith.begin(), other.cantBeWith.end(), i) != other.cantBeWith.end())
+            {
+                std::cerr << "Wiederspruch in Beziehung gefunden\n";
+                exit(EXIT_FAILURE);
+            }
+            if (std::find(other.mustBeWith.begin(), other.mustBeWith.end(), i) == other.mustBeWith.end())
+            {
+                std::cerr << "Einseitige Beziehung gefunden\n";
+                exit(EXIT_FAILURE);
+            }
+        }
+        totalObjCount++;
+    }
+
+    if (totalObjCount > totalContainerSlots)
+    {
+        std::cerr << "Es gibt mehr Objekte als Plaetze\n";
+        exit(EXIT_FAILURE);
+    }
 }
 void GroupSorter::RecursiveTree(std::vector<GroupID> ids)
 {
@@ -143,12 +185,14 @@ bool GroupSorter::Container::operator==(const Container &other) const
 }
 void GroupSorter::AddSolution(std::vector<Container> containers)
 {
+    // Sort the containers and the container contents (needed by next step)
     std::sort(containers.begin(), containers.end());
     for (auto &container : containers)
     {
         std::sort(container.groups.begin(), container.groups.end());
     }
 
+    // Check if this solution already exists
     for (auto &solution : solutions)
     {
         for (int i = 0; i < solution.containers.size(); i++)
@@ -157,7 +201,7 @@ void GroupSorter::AddSolution(std::vector<Container> containers)
                 return;
         }
     }
-    
+
     solutions.push_back(Solution(containers));
 }
 

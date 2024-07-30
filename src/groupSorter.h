@@ -57,6 +57,7 @@ public:
     std::vector<Solution> solutions;
 
 private:
+    void VerifyInput();
     void RecursiveTree(std::vector<GroupID> ids);
     bool TryAdd(GroupID id);
     void RemoveGroup(GroupID id);
