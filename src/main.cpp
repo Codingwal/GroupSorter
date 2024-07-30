@@ -24,7 +24,6 @@ int main(int argc, char **argv)
     groupSorter.containers = containers;
     groupSorter.FindAllSolutions();
 
-    cout << "Solution count: " << groupSorter.solutions.size() << endl;
     personParser.PrintSolutions(groupSorter.solutions, groupSorter.groups);
 
     return 0;

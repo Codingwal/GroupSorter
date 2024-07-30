@@ -13,11 +13,11 @@ Jule:
 
 Felix:
 !   Annika
-& Jorin
+&   Jorin
 
 Annika:
 !   Martin, Felix, Jorin, Flo
 
 Jorin:
-& Felix
-! Annika, Jule
+&   Felix
+!    Annika, Jule

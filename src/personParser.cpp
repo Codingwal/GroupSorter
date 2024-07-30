@@ -80,19 +80,23 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
         {
             if (line.back() != ':')
             {
-                std::cout << "!" << line << "!\n";
                 std::cout << "Fehlender Doppelpunkt in Zeile " << lineIndex << std::endl;
                 exit(EXIT_FAILURE);
             }
 
             std::string name = line.substr(0, line.size() - 1);
             currentPersonName = name;
+            if (people.count(name) != 0)
+            {
+                std::cerr << "Zweite Definition von '" << name << "' in Zeile " << lineIndex << " gefunden\n";
+                exit(EXIT_FAILURE);
+            }
             people[name] = Person();
         }
     }
     file.close();
 
-    // PrintPeople(people, false, false);
+    // PrintPeople(people, true, true);
 
     std::map<GroupSorter::GroupID, GroupSorter::Group> groups;
 
@@ -118,7 +122,7 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
                 auto it = std::find(idToName.begin(), idToName.end(), name);
                 if (it == idToName.end())
                 {
-                    std::cout << "Erwähnter Name '" << name << "' wurde nicht definiert\n";
+                    std::cout << "Erwaehnter Name '" << name << "' wurde nicht definiert\n";
                     exit(EXIT_FAILURE);
                 }
                 size_t index = it - idToName.begin();
@@ -129,7 +133,7 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
                 auto it = std::find(idToName.begin(), idToName.end(), name);
                 if (it == idToName.end())
                 {
-                    std::cout << "Erwähnter Name '" << name << "' wurde nicht definiert\n";
+                    std::cout << "Erwaehnter Name '" << name << "' wurde nicht definiert\n";
                     exit(EXIT_FAILURE);
                 }
                 size_t index = it - idToName.begin();
@@ -143,9 +147,10 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
 }
 void PersonParser::PrintSolutions(std::vector<GroupSorter::Solution> &solutions, std::map<GroupSorter::GroupID, GroupSorter::Group> &groups)
 {
+    std::cout << "Es gibt " << solutions.size() << " Loesungen.\n";
     for (int i = 0; i < solutions.size(); i++)
     {
-        std::cout << "\nSolution " << i << ":\n";
+        std::cout << "\nLoesung " << i + 1 << ":\n"; // i + 1 because nobody (except programmers ofc) counts from zero :)
         GroupSorter::Solution &solution = solutions[i];
         for (auto &container : solution.containers)
         {
