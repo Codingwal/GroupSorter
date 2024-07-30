@@ -164,7 +164,15 @@ bool GroupSorter::Container::operator==(const Container &other) const
 {
     assert(groups.size() != 0);
     assert(other.groups.size() != 0);
-    return groups[0] == other.groups[0];
+
+    if (other.groups.size() != groups.size())
+        return false;
+
+    for (int i = 0; i < groups.size(); i++)
+        if (other.groups[i] != groups[i])
+            return false;
+
+    return true;
 }
 void GroupSorter::AddSolution(std::vector<Container> containers)
 {

@@ -1,23 +1,9 @@
-Flo:
-&   Jule
-!   Annika
-
-Martin:
-!   Annika
-
-Jesper:
-
 Jule:
 &   Flo
-!   Jorin
-
-Felix:
-!   Annika
-&   Jorin
-
+Flo:
+&   Jule
+Martin:
+Jesper:
 Annika:
-!   Martin, Felix, Jorin, Flo
-
+Felix:
 Jorin:
-&   Felix
-!    Annika, Jule
