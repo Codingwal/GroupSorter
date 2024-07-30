@@ -47,7 +47,6 @@ void GroupSorter::FindAllSolutions()
                 groups.erase(groupToAddID);
             }
         }
-        // PrintGroups(groups, false, true);
     }
 
     std::vector<GroupID> ids;

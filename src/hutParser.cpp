@@ -39,8 +39,6 @@ std::vector<GroupSorter::Container> ParseHuts(std::string fileName)
         }
     }
 
-    // PrintHuts(huts);
-
     return huts;
 }
 

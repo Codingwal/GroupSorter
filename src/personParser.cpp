@@ -83,8 +83,6 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
     }
     file.close();
 
-    // PrintPeople(people, true, true);
-
     std::map<GroupSorter::GroupID, GroupSorter::Group> groups;
 
     // Initialize groups & fill the idToName vector
@@ -125,7 +123,6 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
             personIndex++;
         }
     }
-    // GroupSorter::PrintGroups(groups, true, true);
     return groups;
 }
 void PersonParser::PrintSolutions(std::vector<GroupSorter::Solution> &solutions, std::map<GroupSorter::GroupID, GroupSorter::Group> &groups)
