@@ -43,7 +43,7 @@ void GroupSorter::FindAllSolutions()
                 groups.erase(groupToAddID);
             }
         }
-        // PrintGroups(groups, false, false);
+        // PrintGroups(groups, false, true);
     }
 
     std::vector<GroupID> ids;
@@ -59,9 +59,7 @@ void GroupSorter::RecursiveTree(std::vector<GroupID> ids)
     // If all groups have been successfully added, save this as a solution
     if (ids.size() == 0)
     {
-        Solution solution;
-        solution.containers = containers;
-        solutions.push_back(solution);
+        AddSolution(containers);
         return;
     }
 
@@ -130,6 +128,39 @@ void GroupSorter::RemoveGroup(GroupID id)
 
     assert(std::find(ctr.groups.begin(), ctr.groups.end(), id) == ctr.groups.end());
 }
+
+bool GroupSorter::Container::operator<(const Container &other) const
+{
+    assert(groups.size() != 0);
+    assert(other.groups.size() != 0);
+    return groups[0] < other.groups[0];
+}
+bool GroupSorter::Container::operator==(const Container &other) const
+{
+    assert(groups.size() != 0);
+    assert(other.groups.size() != 0);
+    return groups[0] == other.groups[0];
+}
+void GroupSorter::AddSolution(std::vector<Container> containers)
+{
+    std::sort(containers.begin(), containers.end());
+    for (auto &container : containers)
+    {
+        std::sort(container.groups.begin(), container.groups.end());
+    }
+
+    for (auto &solution : solutions)
+    {
+        for (int i = 0; i < solution.containers.size(); i++)
+        {
+            if (solution.containers[i] == containers[i])
+                return;
+        }
+    }
+    
+    solutions.push_back(Solution(containers));
+}
+
 void GroupSorter::PrintGroups(std::map<GroupID, Group> groups, bool printMustBeWith, bool printCantBeWith)
 {
     std::cout << "\nPrinting groups\n";

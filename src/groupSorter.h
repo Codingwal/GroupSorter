@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <map>
 #include <algorithm>
+#include <cassert>
 
 #define CONTAINS(vector, element) (std::find(vector.begin(), vector.end(), element) != vector.end())
 
@@ -33,10 +34,16 @@ public:
             capacity = _capacity;
             size = 0;
         }
+        bool operator<(const Container &other) const;
+        bool operator==(const Container &other) const;
     };
     struct Solution
     {
         std::vector<Container> containers;
+        Solution(std::vector<Container> _containers)
+        {
+            containers = _containers;
+        }
     };
 
 public:
@@ -53,6 +60,7 @@ private:
     void RecursiveTree(std::vector<GroupID> ids);
     bool TryAdd(GroupID id);
     void RemoveGroup(GroupID id);
+    void AddSolution(std::vector<Container> containers);
 
 private:
     size_t currentContainerIndex = 0;

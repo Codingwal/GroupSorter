@@ -74,10 +74,13 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
             }
             cantBeWith.push_back(name);
         }
+        else if (line == "") // Skip empty lines
+            continue;
         else // Line contains person
         {
             if (line.back() != ':')
             {
+                std::cout << "!" << line << "!\n";
                 std::cout << "Fehlender Doppelpunkt in Zeile " << lineIndex << std::endl;
                 exit(EXIT_FAILURE);
             }
@@ -155,12 +158,11 @@ void PersonParser::PrintSolutions(std::vector<GroupSorter::Solution> &solutions,
             }
             std::cout << "\n";
         }
-        break;
     }
 }
 void PersonParser::PrintPeople(std::map<std::string, Person> &people, bool printMustBeWith, bool printCantBeWith)
 {
-    std::cout << "\nPrinting people\n";
+    std::cout << "\nPrinting people:\n";
     for (auto &person : people)
     {
         std::cout << person.first << ":\n";
