@@ -4,7 +4,7 @@ CXXFLAGS = -std=c++20 -Og -g3 -ggdb -fdiagnostics-color=always
 srcDir = src/
 buildDir = build/
 
-objects = build/main.o build/groupSorter.o build/personParser.o build/hutParser.o build/errorHandler.o
+objects = build/main.o build/groupSorter.o build/personParser.o build/hutParser.o
 
 .PHONY: all
 all: $(objects)
