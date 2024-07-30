@@ -10,7 +10,7 @@ std::vector<GroupSorter::Container> ParseHuts(std::string fileName)
     std::ifstream file(fileName);
 
     if (!file.is_open())
-        Error(Errors::cant_open_file);
+        Error(Errors::cant_open_file, fileName);
 
     std::string line;
     std::string num = "";
@@ -29,7 +29,7 @@ std::vector<GroupSorter::Container> ParseHuts(std::string fileName)
             else if (std::isdigit(c))
                 num.push_back(c);
             else
-                std::cerr << "Invalides Zeichen '" << c << "' in Zeile " << lineIndex << "\n";
+                Error(Errors::invalid_char, c, lineIndex);
         }
         if (num != "")
         {

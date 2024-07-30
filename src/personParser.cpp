@@ -2,17 +2,15 @@
 #include <iostream>
 #include <fstream>
 
+#include "errorHandler.h"
+
 std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std::string fileName)
 {
     std::map<std::string, Person> people;
     std::ifstream file(fileName);
 
     if (!file.is_open())
-    {
-        std::cout << "Datei '" << fileName << "' konnte nicht geöffnet werden\n";
-        exit(EXIT_FAILURE);
-    }
-
+        Error(Errors::cant_open_file, fileName);
     std::string line;
     std::string currentPersonName = "";
     for (int lineIndex = 1; std::getline(file, line); lineIndex++)
@@ -20,10 +18,7 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
         if (line[0] == '&') // Line contains mustBeWith data
         {
             if (currentPersonName == "")
-            {
-                std::cerr << "Fehlender Personenname in Zeile " << lineIndex << std::endl;
-                exit(EXIT_FAILURE);
-            }
+                Error(Errors::missing_person_name, lineIndex);
 
             auto &mustBeWith = people[currentPersonName].mustBeWith;
 
@@ -48,10 +43,7 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
         else if (line[0] == '!') // Line contains cantBeWith data
         {
             if (currentPersonName == "")
-            {
-                std::cerr << "Fehlender Personenname in Zeile " << lineIndex << std::endl;
-                exit(EXIT_FAILURE);
-            }
+                Error(Errors::missing_person_name, lineIndex);
 
             auto &cantBeWith = people[currentPersonName].cantBeWith;
 
@@ -79,18 +71,13 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
         else // Line contains person
         {
             if (line.back() != ':')
-            {
-                std::cout << "Fehlender Doppelpunkt in Zeile " << lineIndex << std::endl;
-                exit(EXIT_FAILURE);
-            }
+                Error(Errors::missing_colon, lineIndex);
 
             std::string name = line.substr(0, line.size() - 1);
             currentPersonName = name;
             if (people.count(name) != 0)
-            {
-                std::cerr << "Zweite Definition von '" << name << "' in Zeile " << lineIndex << " gefunden\n";
-                exit(EXIT_FAILURE);
-            }
+                Error(Errors::multiple_definitions, name, lineIndex);
+
             people[name] = Person();
         }
     }
@@ -121,10 +108,8 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
             {
                 auto it = std::find(idToName.begin(), idToName.end(), name);
                 if (it == idToName.end())
-                {
-                    std::cout << "Erwaehnter Name '" << name << "' wurde nicht definiert\n";
-                    exit(EXIT_FAILURE);
-                }
+                    Error(Errors::undefined_name, name);
+
                 size_t index = it - idToName.begin();
                 groups[personIndex].mustBeWith.push_back(index);
             }
@@ -132,10 +117,8 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
             {
                 auto it = std::find(idToName.begin(), idToName.end(), name);
                 if (it == idToName.end())
-                {
-                    std::cout << "Erwaehnter Name '" << name << "' wurde nicht definiert\n";
-                    exit(EXIT_FAILURE);
-                }
+                    Error(Errors::undefined_name, name);
+
                 size_t index = it - idToName.begin();
                 groups[personIndex].cantBeWith.push_back(index);
             }
