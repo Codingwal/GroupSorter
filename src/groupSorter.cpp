@@ -9,11 +9,12 @@
 void GroupSorter::FindAllSolutions()
 {
     VerifyInput();
+
     // Merge groups
     {
         for (int i = 0; i < groups.size(); i++)
         {
-            // Skip merged and therefor deleted groups
+            // Skip merged and therefore deleted groups
             if (groups.count(i) == 0)
                 continue;
 
@@ -55,8 +56,11 @@ void GroupSorter::FindAllSolutions()
         ids.push_back(pair.first);
     }
 
+    ids.push_back(-1); // Add the placeholder id
+
     RecursiveTree(ids);
 }
+// Verifies the input & sets the placeholder count
 void GroupSorter::VerifyInput()
 {
     size_t totalObjCount = 0;
@@ -82,16 +86,26 @@ void GroupSorter::VerifyInput()
             if (std::find(other.mustBeWith.begin(), other.mustBeWith.end(), i) == other.mustBeWith.end())
                 Error(Errors::one_way_relation);
         }
+        for (ObjID otherID : group.cantBeWith)
+        {
+            auto &other = groups[otherID];
+            if (std::find(other.cantBeWith.begin(), other.cantBeWith.end(), i) == other.cantBeWith.end())
+                Error(Errors::one_way_relation);
+        }
         totalObjCount++;
     }
 
     if (totalObjCount > totalContainerSlots)
         Error(Errors::more_objs_than_space);
+
+    placeholderCount = totalContainerSlots - totalObjCount;
 }
 void GroupSorter::RecursiveTree(std::vector<GroupID> ids)
 {
+    assert(CONTAINS(ids, -1));
+
     // If all groups have been successfully added, save this as a solution
-    if (ids.size() == 0)
+    if (ids.size() == 1 && placeholderCount == 0)
     {
         AddSolution(containers);
         return;
@@ -99,6 +113,28 @@ void GroupSorter::RecursiveTree(std::vector<GroupID> ids)
 
     for (GroupID id : ids)
     {
+        if (id == -1)
+        {
+            if (placeholderCount == 0)
+                continue;
+
+            assert(currentContainerIndex < containers.size());
+
+            // Add placeholder to container
+            Container &ctr = containers[currentContainerIndex];
+            ctr.groups.push_back(-1);
+            ctr.size++;
+            if (ctr.size == ctr.capacity) // If the container is now full, switch to the next container
+                currentContainerIndex++;
+
+            placeholderCount--;
+            RecursiveTree(ids);
+            placeholderCount++;
+
+            RemoveGroup(id);
+            continue;
+        }
+
         if (!TryAdd(id))
             continue;
         ids.erase(std::find(ids.begin(), ids.end(), id));
@@ -149,15 +185,23 @@ void GroupSorter::RemoveGroup(GroupID id)
 
     Container &ctr = containers[currentContainerIndex];
     ctr.groups.pop_back();
-    ctr.size -= groups[id].objs.size();
 
-    assert(std::find(ctr.groups.begin(), ctr.groups.end(), id) == ctr.groups.end());
+    if (id != -1)
+        ctr.size -= groups[id].objs.size();
+    else
+        ctr.size--;
+
+    assert(id == -1 || !CONTAINS(ctr.groups, id)); // Only throws if id != -1 and ctr.groups.contains(id)
 }
 
 bool GroupSorter::Container::operator<(const Container &other) const
 {
     assert(groups.size() != 0);
     assert(other.groups.size() != 0);
+
+    // if (groups.size() != other.groups.size())
+    //     return groups.size() > other.groups.size(); // Print bigger containers first
+
     return groups[0] < other.groups[0];
 }
 bool GroupSorter::Container::operator==(const Container &other) const
@@ -177,18 +221,37 @@ bool GroupSorter::Container::operator==(const Container &other) const
 void GroupSorter::AddSolution(std::vector<Container> containers)
 {
     // Sort the containers and the container contents (needed by next step)
-    std::sort(containers.begin(), containers.end());
     for (auto &container : containers)
     {
         std::sort(container.groups.begin(), container.groups.end());
     }
+    std::sort(containers.begin(), containers.end());
+
+    // if (containers[0].groups[0] == 0 && containers[1].groups[0] == 1 && containers[1].groups[1] == 4 && containers[1].groups[2] == 6 && containers[2].groups[0] == 2)
+    // {
+    //     PrintContainers(containers);
+    //     for (auto &solution : solutions)
+    //     {
+    //         for (int i = 0; i < solution.containers.size(); i++)
+    //         {
+    //             if (solution.containers[i] == containers[i])
+    //             {
+    //                 std::cout << containers[i].groups[0] << "; " << i;
+    //                 exit(EXIT_FAILURE);
+    //             }
+    //         }
+    //     }
+    // }
 
     // Check if this solution already exists
     for (auto &solution : solutions)
     {
         for (int i = 0; i < solution.containers.size(); i++)
         {
-            if (solution.containers[i] == containers[i])
+            if (solution.containers[i] != containers[i])
+                break;
+
+            if (i == solution.containers.size() - 1)
                 return;
         }
     }

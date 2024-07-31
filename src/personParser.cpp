@@ -123,6 +123,7 @@ std::map<GroupSorter::GroupID, GroupSorter::Group> PersonParser::ParsePeople(std
             personIndex++;
         }
     }
+
     return groups;
 }
 void PersonParser::PrintSolutions(std::vector<GroupSorter::Solution> &solutions, std::map<GroupSorter::GroupID, GroupSorter::Group> &groups)

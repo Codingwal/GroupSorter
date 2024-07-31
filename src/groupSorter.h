@@ -67,4 +67,5 @@ private:
 
 private:
     size_t currentContainerIndex = 0;
+    size_t placeholderCount;
 };
